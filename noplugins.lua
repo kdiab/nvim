@@ -1,20 +1,3 @@
--- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
-end
-vim.opt.rtp:prepend(lazypath)
-
 -- vim settings
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -25,7 +8,6 @@ vim.opt.syntax = "on"
 vim.opt.backup = false
 vim.opt.compatible = false                              -- turn off vi compatibility mode
 vim.opt.number = true                                   -- turn on line numbers
-vim.opt.cursorline = true                               -- add cursor line
 vim.opt.mouse = 'r'                                     -- enable the mouse in all modes
 vim.opt.ignorecase = true                               -- enable case insensitive searching
 vim.opt.smartcase = true                                -- all searches are case insensitive unless there's a capital letter
@@ -50,6 +32,14 @@ vim.opt.splitright = true                               -- vertical split to the
 vim.opt.termguicolors = true                            -- terminal gui colors
 
 -- vim cmd commands:
+-- set path: search down recursively from root
+vim.cmd [[
+	set path+=**
+	colorscheme rosepine
+	filetype plugin on
+	set wildmenu
+]]
+
 -- functional wrapper for mapping custom keybindings
 function map(mode, lhs, rhs, opts)
     local options = { noremap = true }
@@ -62,20 +52,20 @@ end
 -- NORMAL MODE --
 
 -- Tab bindings 
-map("n", "<leader>n", ":tabnew<CR>")                    -- creates new tab
-map("n", "<leader>d", ":tabclose<CR>")                  -- closes current tab
-map("n", "<leader>[", ":tabprevious<CR>")               -- moves to previous tab
-map("n", "<leader>]", ":tabnext<CR>")                   -- moves to next tab
+map("n", "<leader>t", ":tabnew<CR>")                    -- creates new tab
+map("n", "<leader>x", ":tabclose<CR>")                  -- closes current tab
+map("n", "<leader>j", ":tabprevious<CR>")               -- moves to previous tab
+map("n", "<leader>k", ":tabnext<CR>")                   -- moves to next tab
 
 -- easy split generation
-map("n", "<leader>\\", ":vsplit ")                      -- creates a veritcal split
-map("n", "<leader>-", ":split ")                        -- creates a horizontal split
+map("n", "<leader>v", ":vsplit ")                       -- creates a veritcal split
+map("n", "<leader>h", ":split ")                        -- creates a horizontal split
 
 -- easy split navigation
-map("n", "<leader>h", "<C-w>h")                         -- switches to left split
-map("n", "<leader>l", "<C-w>l")                         -- switches to right split
-map("n", "<leader>j", "<C-w>j")                         -- switches to bottom split
-map("n", "<leader>k", "<C-w>k")                         -- switches to top split
+map("n", "<C-h>", "<C-w>h")                             -- switches to left split
+map("n", "<C-l>", "<C-w>l")                             -- switches to right split
+map("n", "<C-j>", "<C-w>j")                             -- switches to bottom split
+map("n", "<C-k>", "<C-w>k")                             -- switches to top split
 
 -- buffer navigation
 map("n", "<Tab>", ":bnext<CR>")                         -- cycle next buffer
@@ -93,30 +83,10 @@ map('n', '<leader>m', ':!ctags -R .<CR><ESC>')          -- gen ctags
 -- VISUAL MODE--
 
 map("v", "<leader>r", "\"hy:%s/<C-r>h//g<left><left>")	-- Replace all instances of highlighted words 
-map("v", "<leader>s", ":sort<CR>")							        -- Sort highlighted text in visual mode with Control+S
+map("v", "<C-s>", ":sort<CR>")							            -- Sort highlighted text in visual mode with Control+S
 map("v", "J", ":m '>+1<CR>gv=gv")						            -- Move current line down
 map("v", "K", ":m '>-2<CR>gv=gv")						            -- Move current line up 
 
 -- INSERT MODE --
 
 map("i", "<C-c>", "<Esc>")								              -- Ctrl-C for Esc
-
--- Setup lazy.nvim
-require("lazy").setup({
-  spec = {
-    { 
-      "rose-pine/neovim", 
-      name = "rose-pine",
-      config = function()
-      require("rose-pine").setup({
-        styles = {
-          italic = false,
-        },
-      })
-      vim.cmd.colorscheme("rose-pine")
-      end,
-    }
-  },
-  install = { colorscheme = { "rose-pine" } },
-  checker = { enabled = true },
-})
