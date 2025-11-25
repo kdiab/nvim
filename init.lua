@@ -1,4 +1,4 @@
--- Bootstrap lazy.nvim
+-- bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -72,10 +72,10 @@ map("n", "<leader>\\", ":vsplit ")                      -- creates a veritcal sp
 map("n", "<leader>-", ":split ")                        -- creates a horizontal split
 
 -- easy split navigation
-map("n", "<leader>h", "<C-w>h")                         -- switches to left split
-map("n", "<leader>l", "<C-w>l")                         -- switches to right split
-map("n", "<leader>j", "<C-w>j")                         -- switches to bottom split
-map("n", "<leader>k", "<C-w>k")                         -- switches to top split
+map("n", "<C-h>", "<C-w>h")                         -- switches to left split
+map("n", "<C-l>", "<C-w>l")                         -- switches to right split
+map("n", "<C-j>", "<C-w>j")                         -- switches to bottom split
+map("n", "<C-k>", "<C-w>k")                         -- switches to top split
 
 -- buffer navigation
 map("n", "<Tab>", ":bnext<CR>")                         -- cycle next buffer
@@ -89,21 +89,22 @@ map("n", "<C-Right>", ":vertical resize -3<CR>")        -- resizes vertical spli
 map('n', '<Esc>', '<cmd>nohlsearch<CR>')                -- remove highlight when esc is pressed	
 map('n', '<leader>f', ':find ')                         -- find file and open it in :edit
 map('n', '<leader>m', ':!ctags -R .<CR><ESC>')          -- gen ctags
+map("n", "K", ":m .-2<CR>==")						                -- move current line up 
+map("n", "J", ":m .+1<CR>==")                           -- move current line down
 
 -- VISUAL MODE--
-
-map("v", "<leader>r", "\"hy:%s/<C-r>h//g<left><left>")	-- Replace all instances of highlighted words 
-map("v", "<leader>s", ":sort<CR>")							        -- Sort highlighted text in visual mode with Control+S
-map("v", "J", ":m '>+1<CR>gv=gv")						            -- Move current line down
-map("v", "K", ":m '>-2<CR>gv=gv")						            -- Move current line up 
+map("v", "<C-r>", "\"hy:%s/<C-r>h//g<left><left>")	-- replace all instances of highlighted words 
+map("v", "<C-s>", ":sort<CR>")							        -- sort highlighted text
+map("v", "J", ":m '>+1<CR>gv-gv")                   -- move selection down
+map("v", "K", ":m '<-2<CR>gv-gv")                   -- move selection up
 
 -- INSERT MODE --
+map("i", '<C-c>', "<Esc>")								              -- Ctrl-C for Esc
 
-map("i", "<C-c>", "<Esc>")								              -- Ctrl-C for Esc
-
--- Setup lazy.nvim
+-- setup lazy.nvim
 require("lazy").setup({
   spec = {
+    -- theme
     { 
       "rose-pine/neovim", 
       name = "rose-pine",
@@ -115,7 +116,7 @@ require("lazy").setup({
       })
       vim.cmd.colorscheme("rose-pine")
       end,
-    }
+    },
   },
   install = { colorscheme = { "rose-pine" } },
   checker = { enabled = true },
