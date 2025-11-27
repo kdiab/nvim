@@ -125,5 +125,11 @@ require("lazy").setup({
   },
   install = { colorscheme = { "rose-pine" } },
   checker = { enabled = true },
-  rocks = { enabled = true },
+  rocks = { enabled = false },
 })
+
+-- Disable stuff
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+
