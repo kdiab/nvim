@@ -72,10 +72,10 @@ map("n", "<leader>\\", ":vsplit ")                      -- creates a veritcal sp
 map("n", "<leader>-", ":split ")                        -- creates a horizontal split
 
 -- easy split navigation
-map("n", "<C-h>", "<C-w>h")                         -- switches to left split
-map("n", "<C-l>", "<C-w>l")                         -- switches to right split
-map("n", "<C-j>", "<C-w>j")                         -- switches to bottom split
-map("n", "<C-k>", "<C-w>k")                         -- switches to top split
+map("n", "<C-h>", "<C-w>h")                             -- switches to left split
+map("n", "<C-l>", "<C-w>l")                             -- switches to right split
+map("n", "<C-j>", "<C-w>j")                             -- switches to bottom split
+map("n", "<C-k>", "<C-w>k")                             -- switches to top split
 
 -- buffer navigation
 map("n", "<Tab>", ":bnext<CR>")                         -- cycle next buffer
@@ -117,7 +117,13 @@ require("lazy").setup({
       vim.cmd.colorscheme("rose-pine")
       end,
     },
+    -- telescope
+    {
+    'nvim-telescope/telescope.nvim', tag = 'v0.1.9',
+     dependencies = { 'nvim-lua/plenary.nvim' }
+    },
   },
   install = { colorscheme = { "rose-pine" } },
   checker = { enabled = true },
+  rocks = { enabled = true },
 })
