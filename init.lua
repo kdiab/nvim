@@ -92,10 +92,10 @@ map("n", "K", ":m .-2<CR>==")						                -- move current line up
 map("n", "J", ":m .+1<CR>==")                           -- move current line down
 
 -- VISUAL MODE--
-map("v", "<C-r>", "\"hy:%s/<C-r>h//g<left><left>")	-- replace all instances of highlighted words 
-map("v", "<C-s>", ":sort<CR>")							        -- sort highlighted text
-map("v", "J", ":m '>+1<CR>gv-gv")                   -- move selection down
-map("v", "K", ":m '<-2<CR>gv-gv")                   -- move selection up
+map("v", "<C-r>", "\"hy:%s/<C-r>h//g<left><left>")      -- replace all instances of highlighted words 
+map("v", "<C-s>", ":sort<CR>")                          -- sort highlighted text
+map("v", "J", ":m '>+1<CR>gv-gv")                       -- move selection down
+map("v", "K", ":m '<-2<CR>gv-gv")                       -- move selection up
 
 -- INSERT MODE --
 map("i", '<C-c>', "<Esc>")								              -- Ctrl-C for Esc
@@ -121,6 +121,7 @@ require("lazy").setup({
       'nvim-telescope/telescope.nvim', tag = 'v0.1.9',
       dependencies = { 'nvim-lua/plenary.nvim' }
     },
+    -- treesitter
     {
       "nvim-treesitter/nvim-treesitter",
       branch = 'master',
@@ -141,6 +142,7 @@ require("lazy").setup({
       end
     },
   },
+  -- misc
   install = { colorscheme = { "rose-pine" } },
   checker = { enabled = true },
   rocks = { enabled = false },
