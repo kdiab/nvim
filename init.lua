@@ -21,7 +21,6 @@ vim.g.maplocalleader = " "
 vim.g.netrw_banner = 0                                  -- gets rid of the annoying banner for netrw
 vim.g.netrw_altv = 1                                    -- change from left splitting to right splitting
 vim.g.netrw_liststyle = 3                               -- tree style view in netrw
-vim.opt.syntax = "on"
 vim.opt.backup = false
 vim.opt.compatible = false                              -- turn off vi compatibility mode
 vim.opt.number = true                                   -- turn on line numbers
@@ -52,11 +51,11 @@ vim.opt.termguicolors = true                            -- terminal gui colors
 -- vim cmd commands:
 -- functional wrapper for mapping custom keybindings
 function map(mode, lhs, rhs, opts)
-    local options = { noremap = true }
-    if opts then
-        options = vim.tbl_extend("force", options, opts)
-    end
-    vim.api.nvim_set_keymap(mode, lhs, rhs, options)
+  local options = { noremap = true }
+  if opts then
+    options = vim.tbl_extend("force", options, opts)
+  end
+  vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
 
 -- NORMAL MODE --
@@ -109,18 +108,37 @@ require("lazy").setup({
       "rose-pine/neovim", 
       name = "rose-pine",
       config = function()
-      require("rose-pine").setup({
-        styles = {
-          italic = false,
-        },
-      })
-      vim.cmd.colorscheme("rose-pine")
+        require("rose-pine").setup({
+          styles = {
+            italic = false,
+          },
+        })
+        vim.cmd.colorscheme("rose-pine")
       end,
     },
     -- telescope
     {
-    'nvim-telescope/telescope.nvim', tag = 'v0.1.9',
-     dependencies = { 'nvim-lua/plenary.nvim' }
+      'nvim-telescope/telescope.nvim', tag = 'v0.1.9',
+      dependencies = { 'nvim-lua/plenary.nvim' }
+    },
+    {
+      "nvim-treesitter/nvim-treesitter",
+      branch = 'master',
+      lazy = false,
+      build = ":TSUpdate",
+      config = function()
+        local configs = require("nvim-treesitter.configs")
+        configs.setup({
+          ensure_installed = { "c", "lua", "vim", "vimdoc","markdown", "markdown_inline" },
+          sync_install = false,
+          auto_install = true,
+          highlight = {
+            enable = true,
+            additional_vim_regex_highlighting = false,
+          },
+          indent = { enable = true },
+        })
+      end
     },
   },
   install = { colorscheme = { "rose-pine" } },
@@ -132,4 +150,4 @@ require("lazy").setup({
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_node_provider = 0
-
+vim.g.python3_host_prog = vim.fn.expand('~/.pyenv/versions/neovim/bin/python')
