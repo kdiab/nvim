@@ -35,7 +35,7 @@ vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
 vim.opt.fileencoding = "utf-8"                          -- encoding set to utf-8
 vim.opt.pumheight = 10                                  -- number of items in popup menu
-vim.opt.signcolumn = "auto"
+vim.opt.signcolumn = "yes"
 vim.opt.expandtab = true                                -- expand tab 
 vim.opt.smartindent = true
 vim.opt.showmode = true
@@ -47,6 +47,8 @@ vim.opt.completeopt = { "menuone", "noselect" }         -- don't select first op
 vim.opt.splitbelow = true                               -- split go below
 vim.opt.splitright = true                               -- vertical split to the right
 vim.opt.termguicolors = true                            -- terminal gui colors
+vim.opt.undofile = true                                 -- enable persistent undo
+vim.opt.undodir = vim.fn.stdpath("data") .. "/undo"     -- set undo directory
 
 -- vim cmd commands:
 -- functional wrapper for mapping custom keybindings
@@ -57,6 +59,16 @@ function map(mode, lhs, rhs, opts)
   end
   vim.api.nvim_set_keymap(mode, lhs, rhs, options)
 end
+
+-- open file and place cursor at last known location
+vim.api.nvim_create_autocmd("BufReadPost", {
+  pattern = "*",
+  callback = function()
+    if vim.fn.line("'\"") > 0 and vim.fn.line("'\"") <= vim.fn.line("$") then
+      vim.cmd("normal! g`\"")
+    end
+  end,
+})
 
 -- NORMAL MODE --
 
@@ -92,7 +104,6 @@ map("n", "K", ":m .-2<CR>==")						                -- move current line up
 map("n", "J", ":m .+1<CR>==")                           -- move current line down
 
 -- VISUAL MODE--
-map("v", "<C-r>", "\"hy:%s/<C-r>h//g<left><left>")      -- replace all instances of highlighted words 
 map("v", "<C-s>", ":sort<CR>")                          -- sort highlighted text
 map("v", "J", ":m '>+1<CR>gv-gv")                       -- move selection down
 map("v", "K", ":m '<-2<CR>gv-gv")                       -- move selection up
@@ -104,8 +115,8 @@ map("i", '<C-c>', "<Esc>")								              -- Ctrl-C for Esc
 require("lazy").setup({
   spec = {
     -- theme
-    { 
-      "rose-pine/neovim", 
+    {
+      "rose-pine/neovim",
       name = "rose-pine",
       config = function()
         require("rose-pine").setup({
@@ -119,7 +130,23 @@ require("lazy").setup({
     -- telescope
     {
       'nvim-telescope/telescope.nvim', tag = 'v0.1.9',
-      dependencies = { 'nvim-lua/plenary.nvim' }
+      dependencies = { 'nvim-lua/plenary.nvim' },
+      config = function()
+        local builtin = require('telescope.builtin')
+
+        vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find files' })
+        vim.keymap.set('n', '<leader>fg', builtin.git_files, { desc = 'Find git files' })
+        vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = 'Recent files' })
+        vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
+        vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = 'Live grep' })
+        vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = 'Find word under cursor' })
+        vim.keymap.set('n', '<C-f>', builtin.current_buffer_fuzzy_find, { desc = 'Find in current buffer' })
+        vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help tags' })
+        vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = 'Keymaps' })
+        vim.keymap.set('n', '<leader>fm', builtin.marks, { desc = 'Marks' })
+        vim.keymap.set('n', '<leader>gc', builtin.git_commits, { desc = 'Git commits' })
+        vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = 'Git status' })
+      end,
     },
     -- treesitter
     {
@@ -140,6 +167,82 @@ require("lazy").setup({
           indent = { enable = true },
         })
       end
+    },
+    -- LSP 
+    {
+      "neovim/nvim-lspconfig",
+      dependencies = {
+        "williamboman/mason.nvim",
+        "williamboman/mason-lspconfig.nvim",
+      },
+      config = function()
+        require("mason").setup()
+        require("mason-lspconfig").setup({
+          ensure_installed = { "lua_ls" },
+          automatic_installation = true,
+        })
+        local coq = require("coq")
+
+        vim.lsp.config('*', {
+          capabilities = {
+            workspace = {
+              didChangeWatchedFiles = {
+                dynamicRegistration = true,
+              },
+            },
+          },
+        })
+
+        vim.api.nvim_create_autocmd('LspAttach', {
+          callback = function(args)
+            local opts = { buffer = args.buf, noremap = true, silent = true }
+            vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts) -- goto definition
+            vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts) -- goto declaration
+            vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts) -- goto references
+            vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts) -- goto implementation
+            vim.keymap.set('n', '<C-d>', vim.lsp.buf.hover, opts) -- docs
+            vim.keymap.set('n', '<C-a>', vim.lsp.buf.code_action, opts) -- show fixes
+            vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename, opts) -- global rename
+            vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+            vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+          end,
+        })
+
+        vim.lsp.config('lua_ls', coq.lsp_ensure_capabilities({
+          settings = {
+            Lua = {
+              diagnostics = { globals = { "vim" } },
+            },
+          },
+        }))
+
+        vim.lsp.enable('lua_ls')
+      end,
+    },
+    -- coq
+    {
+      'ms-jpq/coq_nvim',
+      branch = 'coq',
+      build = ':COQdeps',
+      init = function()
+        vim.g.coq_settings = {
+          auto_start = 'shut-up',
+          keymap = {
+            recommended = false,
+          },
+        }
+      end,
+    },
+    {
+      'ms-jpq/coq.artifacts',
+      branch = 'artifacts',
+    },
+    -- undo tree
+    {
+      'mbbill/undotree',
+      config = function()
+        vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
+      end,
     },
   },
   -- misc
