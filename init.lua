@@ -42,7 +42,7 @@ vim.opt.showmode = true
 vim.opt.scrolloff = 10                                  -- scroll page when cursor is 10 lines from top/bottom
 vim.opt.sidescrolloff = 30                              -- scroll page when cursor is 30 spaces from left/right
 vim.opt.guifont = "monospace:h18"                       -- set font + size	
-vim.opt.clipboard = unnamedplus
+vim.opt.clipboard = "unnamedplus"
 vim.opt.completeopt = { "menuone", "noselect" }         -- don't select first option when autocompleting
 vim.opt.splitbelow = true                               -- split go below
 vim.opt.splitright = true                               -- vertical split to the right
@@ -157,7 +157,7 @@ require("lazy").setup({
       config = function()
         local configs = require("nvim-treesitter.configs")
         configs.setup({
-          ensure_installed = { "c", "lua", "vim", "vimdoc","markdown", "markdown_inline" },
+          ensure_installed = { "c", "lua", "cpp", "vim", "vimdoc","markdown", "markdown_inline" },
           sync_install = false,
           auto_install = true,
           highlight = {
@@ -178,7 +178,7 @@ require("lazy").setup({
       config = function()
         require("mason").setup()
         require("mason-lspconfig").setup({
-          ensure_installed = { "lua_ls" },
+          ensure_installed = { "lua_ls", "clangd" },
           automatic_installation = true,
         })
         local coq = require("coq")
@@ -217,6 +217,8 @@ require("lazy").setup({
         }))
 
         vim.lsp.enable('lua_ls')
+        vim.lsp.config('clangd', coq.lsp_ensure_capabilities({}))
+        vim.lsp.enable('clangd')
       end,
     },
     -- coq
@@ -247,7 +249,7 @@ require("lazy").setup({
   },
   -- misc
   install = { colorscheme = { "rose-pine" } },
-  checker = { enabled = true },
+  checker = { enabled = false },
   rocks = { enabled = false },
 })
 
